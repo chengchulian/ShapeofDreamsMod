@@ -651,6 +651,15 @@ RoomMonsters
 	
 	//幻想化（约4-5倍血量的盾+免控+90%减治疗）
 	mirageChance = 1f;
+    ```
+###  【BOSS】幻想化减治疗
+```c#
+Se_MirageSkin_Delusion_Delusional
+-->
+VictimOntakenHealProcessor
+    -->
+    //x=0.8时，减少80%治疗
+    float health_reduce_multiplier =xf;
 ```
     
 ###   【BOSS】对boss限伤
