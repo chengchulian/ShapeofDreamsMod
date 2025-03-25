@@ -1,4 +1,4 @@
-###房间人数
+###  房间人数
 
 ```c#
 //方法
@@ -39,7 +39,8 @@ Star_Global_ShopDiscount
 	BonusRatio = new float[] { 0.33f, 0.33f, 0.33f, 0.33f };
 ```
 
-### 【拓展】商品、净化、刷新、出售一元购
+### 【拓展】商品、净化、刷新、出售一元购（X）丨不推荐使用
+> 标注（x）就是`未成功`、或者`暂时未尝试`、或者`不完全生效`、或者`其他的问题`
 
 ```c#
 //商品
@@ -133,14 +134,14 @@ int sellGold = 1;
 > 		return Mathf.RoundToInt(sum / (float)this._merchandises[player.netId].Length * 0.5f);
 > ```
 
-###【天赋】金币掉落
+### 【天赋】金币掉落
 
 ```c#
 Star_Global_KillGoldBonus
 	——》
 	BonusRatio = new float[] { 1.66f, 1.66f, 1.66f, 1.66f, 1.66f };
 ```
-###【天赋】梦尘掉落
+### 【天赋】梦尘掉落
 ```c#
 Star_Global_KillDreamDustBonus
 	——》
@@ -417,13 +418,13 @@ Dew.Core
 > this.maxPopulationMultiplier *= 1f
 > ```
 
-###【难度】有益节点倍率
+### 【难度】有益节点倍率
 
 ```c#
 this.beneficialNodeMultiplier *= 100f;
 ```
 
-###【拓展】治疗费用
+### 【拓展】治疗费用
 
 ```
 Cost Shrine
@@ -442,7 +443,7 @@ return new Cost
 this.harmfulNodeMultiplier *= 100f;
 ```
 
-###【难度】猎人扩散速度
+### 【难度】猎人扩散速度
 
 ```c#
 this.hunterSpreadChance *= 1f;
@@ -615,7 +616,7 @@ if (rule.isBossSpawn)
 }
 ```
 
-###【BOSS】BOSS特殊状态
+### 【BOSS】BOSS特殊状态
 ```c#
 RoomMonsters
 ——》 SpawnMonstersRoutine
@@ -674,9 +675,9 @@ GetNodeIndexSettings
 	public bool preferCloserToExit = true;改为false
 ```
 
-> 标注（x）就是`未成功`、或者`暂时未尝试`、或者`不完全生效`、或者`其他的问题`
 
-###提高怪物波次（x）
+
+### 提高怪物波次（x）
 
 ```c#
 //忘记位置了，先忽略这条
@@ -684,7 +685,7 @@ public int wavesMin = 3;
 public int wavesMax = 5;
 ```
 
-###【混沌】混沌必定为红
+### 【混沌】混沌必定为红
 ```c#
 Shrine_Chaos
 ——》SetRandomRarity
@@ -698,14 +699,14 @@ Shrine_Chaos
 	this.Networkrarity = Rarity.Legendary;
 ```
 
-> | 颜色 | 对应             |
-> | ---- | ---------------- |
-> | 白   | Rarity.Common    |
-> | 蓝   | Rarity.Rare      |
-> | 紫   | Rarity.Epic      |
-> | 红   | Rarity.Legendary |
+> | 混沌颜色 | 对应             |
+> |------| ---------------- |
+> | 白    | Rarity.Common    |
+> | 蓝    | Rarity.Rare      |
+> | 紫    | Rarity.Epic      |
+> | 红    | Rarity.Legendary |
 
-###【混沌】混沌提供提供的选择数量（x）
+### 【混沌】混沌提供提供的选择数量（x）
 
 ```c#
 Shrine_Chaos
@@ -890,17 +891,17 @@ Ai_R_SanctuaryOfEl_Ground
 OnCreateSequenced
 ——》
 //在 this.Network_desiredPosition = base.info.caster.agentPosition; 下一行添加
- 		foreach (DewPlayer dewPlayer in DewPlayer.humanPlayers)
-        {
-            if (dewPlayer.hero != null && dewPlayer.hero.isKnockedOut)
-            {
-                Entity hero = dewPlayer.hero;
-                hero.CreateAbilityInstance<Ai_ReviveHero>(base.info.caster.agentPosition, null, new CastInfo(hero, hero), delegate(Ai_ReviveHero a)
-                {
-                    a.reviveHealthMultiplier = 0.4f;
-                });
-            }
-        }
+ 		foreach (DewPlayer dewPlayer in DewPlayer.humanPlayers)
+        {
+            if (dewPlayer.hero != null && dewPlayer.hero.isKnockedOut)
+            {
+                Entity hero = dewPlayer.hero;
+                hero.CreateAbilityInstance<Ai_ReviveHero>(base.info.caster.agentPosition, null, new CastInfo(hero, hero), delegate(Ai_ReviveHero a)
+                {
+                    a.reviveHealthMultiplier = 0.4f;
+                });
+            }
+        }
 ```
 
 > 改正报错：
