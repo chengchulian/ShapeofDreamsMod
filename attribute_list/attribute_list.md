@@ -704,7 +704,7 @@ GetNodeIndexSettings
 	WorldNodeType.Special,
 	WorldNodeType.ExitBoss
 }
-	
+```
 
 ### 【地图】BOSS图死亡生成灵魂
 
