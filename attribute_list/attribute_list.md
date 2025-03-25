@@ -40,7 +40,9 @@ Star_Global_ShopDiscount
 	BonusRatio = new float[] { 0.33f, 0.33f, 0.33f, 0.33f };
 ```
 
-###  【拓展】商品、净化、刷新、出售一元购
+###  【拓展】商品、净化、刷新、出售一元购（x）丨不推荐
+
+> 标注（x）就是未成功、或者暂时未尝试、或者不完全生效、或者其他的问题
 
 ```c#
 //商品
@@ -255,7 +257,7 @@ Star_Global_FirstGemUpgrade
 	BonusQuality = new int[] { 80, 80, 80};
 ```
 
-###  【拓展】移除精华（x）
+###  【拓展】移除精华
 
 ```
 SelectGemAndQuality
@@ -707,7 +709,7 @@ Se_HeroKnockedOut
     && NetworkedManagerBase<ZoneManager>.instance.currentNode.type != WorldNodeType.ExitBoss
 ```
 
-### 提高怪物波次（x）
+### 【地图】提高怪物波次（x）
 
 ```c#
 //忘记位置了，先忽略这条
