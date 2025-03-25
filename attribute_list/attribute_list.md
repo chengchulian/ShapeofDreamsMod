@@ -637,6 +637,9 @@ if (rule.isBossSpawn)
 ```
 
 ### 【BOSS】BOSS特殊状态
+
+此数值为概率 1为100% 0.5为50%
+
 ```c#
 RoomMonsters
 --> SpawnMonstersRoutine
@@ -644,19 +647,10 @@ RoomMonsters
 	-->
 	
 	//猎人化（更硬、更快）
-	hunterChance = 100f;
+	hunterChance = 1f; 
 	
 	//幻想化（约4-5倍血量的盾+免控+90%减治疗）
-	mirageChance = 100f;
-```
-###  【BOSS】幻想化减治疗
-```c#
-Se_MirageSkin_Delusion_Delusional
--->
-VictimOntakenHealProcessor
-    -->
-    //x=0.8时，减少80%治疗
-    float health_reduce_multiplier =xf;
+	mirageChance = 1f;
 ```
     
 ###   【BOSS】对boss限伤
@@ -699,17 +693,34 @@ GetNodeIndexSettings
 	WorldNodeType.Merchant,
 	WorldNodeType.Quest,
 	WorldNodeType.Special,
-	WorldNodeType.ExitBoss}
+	WorldNodeType.ExitBoss
+}
 	
-//修复boss房不能复活
-Se_HeroKnockedOut
--->ActiveLogicUpdate
-    -->
-    //IL编辑-删除
-    && NetworkedManagerBase<ZoneManager>.instance.currentNode.type != WorldNodeType.ExitBoss
+
+### 【地图】BOSS图死亡生成灵魂
+
+**前置条件: 需本地图复活+超级原地复活**
+
+```c#
+Se_HeroKnockedOut.ActiveLogicUpdate()
+    
+    // 这里有是否为BOSS房判断,删除此判断即可
+    		if (!this._didAddQuest && Time.time - base.creationTime > 1f && Dew.SelectRandomAliveHero(false) != null && NetworkedManagerBase<ZoneManager>.instance.currentNode.type != WorldNodeType.ExitBoss)
 ```
 
-### 【地图】提高怪物波次（x）
+在此行代码右键 编辑IL指令 删除以下指令(序号和偏移不一定是这些)
+
+```il
+21	0039	call	!0 class NetworkedManagerBase`1<class ZoneManager>::get_instance()
+22	003E	callvirt	instance valuetype WorldNodeData ZoneManager::get_currentNode()
+23	0043	ldfld	valuetype WorldNodeType WorldNodeData::'type'
+24	0048	ldc.i4	1000
+25	004D	beq.s	35 (006D) ldarg.0 
+```
+
+
+
+### 提高怪物波次（x）
 
 ```c#
 //忘记位置了，先忽略这条
