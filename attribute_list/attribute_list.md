@@ -1003,6 +1003,77 @@ OnCreate
 	}
 ```
 
+
+
+## 【UI】显示总伤害及最强一击
+
+位置
+
+```C#
+Forest_LoopCat_Spawner
+-->
+OnCreate
+```
+
+头部导包
+
+```c#
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+```
+
+备注:这段代码被编译后再被反编译的结果是错误的，会产生编译错误，所以和其他东西一起修改时，应当最后插入。
+
+```C#
+//原代码
+base.OnCreate();
+if (!base.isServer)
+{
+	return;
+}
+
+//在后面添加以下代码
+
+
+DewGameResult tracked = (DewGameResult) typeof(GameResultManager).GetField("_tracked", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(NetworkedManagerBase<GameResultManager>.instance);
+
+if (tracked != null)
+{
+    List<(string name, float totalDmg, float maxDmg)> dmgList = new List<(string, float, float)>();
+
+    foreach (DewGameResult.PlayerData playerData in tracked.players)
+    {
+       string playerProfileName = playerData.playerProfileName;
+       float totalDmg = playerData.dealtDamageToEnemies;
+       float maxDmg = playerData.maxDealtSingleDamageToEnemy;
+       dmgList.Add((playerProfileName, totalDmg, maxDmg));
+    }
+
+    // 按总伤害降序排序
+    dmgList.Sort((a, b) => b.totalDmg.CompareTo(a.totalDmg));
+    StringBuilder sb = new StringBuilder();
+    sb.AppendLine("伤害排行");
+    foreach (ValueTuple<string, float, float> valueTuple in dmgList)
+    {
+       string playerProfileName2 = valueTuple.Item1;
+       float totalDmg2 = valueTuple.Item2;
+       float maxDmg2 = valueTuple.Item3;
+       string totalDmgFormatted = totalDmg2.ToString("#,0", CultureInfo.InvariantCulture);
+       string maxDmgFormatted = maxDmg2.ToString("#,0", CultureInfo.InvariantCulture);
+       sb.AppendLine(string.Concat(new string[] { playerProfileName2, ": 总伤害 ", totalDmgFormatted, " | 最强一击 ", maxDmgFormatted }));
+    }
+    Dew.CallDelayed(delegate
+    {
+       NetworkedManagerBase<ChatManager>.instance.BroadcastChatMessage(new ChatManager.Message
+       {
+          type = ChatManager.MessageType.Raw,
+          content = sb.ToString()
+       });
+    }, 200);
+}
+```
+
 ---
 
 ### 【技能】牢癫·增强
