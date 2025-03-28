@@ -948,6 +948,61 @@ QuestManager.OnStartServer()
 
 ---
 
+### 【任务】移除光之碎片启动器
+
+位置
+
+```C#
+Forest_LoopCat_Spawner
+-->
+OnCreate
+```
+
+头部导包
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+```
+
+
+
+```C#
+//原代码
+base.OnCreate();
+if (!base.isServer)
+{
+	return;
+}
+
+//在后面添加以下代码
+
+
+
+			// 获取Dew类的Type对象
+			Type dewType = typeof(Dew);
+        
+			// 获取私有静态字段_allRoomModifiers
+			FieldInfo field = dewType.GetField("_allRoomModifiers", 
+				BindingFlags.NonPublic | BindingFlags.Static);
+        
+			if (field != null)
+			{
+				// 获取当前字段的值（List<Type>实例）
+				List<Type> list = (List<Type>)field.GetValue(null);
+				foreach (Type type in list.ToList())
+				{
+					if (type.FullName == "RoomMod_FragmentOfRadiance_StartProp")
+					{
+						list.Remove(type);
+					}
+				}
+			}
+```
+
 ### 【BOSS】层主 1·癫狂掉率
 
 ```c#
@@ -1005,7 +1060,7 @@ OnCreate
 
 
 
-## 【UI】显示总伤害及最强一击
+### 【UI】显示总伤害及最强一击
 
 位置
 
