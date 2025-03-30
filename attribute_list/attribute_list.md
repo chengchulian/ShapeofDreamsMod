@@ -963,8 +963,11 @@ OnCreate
 ```C#
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Mirror;
 using UnityEngine;
 ```
 
@@ -981,26 +984,11 @@ if (!base.isServer)
 //在后面添加以下代码
 
 
-
-			// 获取Dew类的Type对象
-			Type dewType = typeof(Dew);
-        
-			// 获取私有静态字段_allRoomModifiers
-			FieldInfo field = dewType.GetField("_allRoomModifiers", 
-				BindingFlags.NonPublic | BindingFlags.Static);
-        
-			if (field != null)
-			{
-				// 获取当前字段的值（List<Type>实例）
-				List<Type> list = (List<Type>)field.GetValue(null);
-				foreach (Type type in list.ToList())
-				{
-					if (type.FullName == "RoomMod_FragmentOfRadiance_StartProp")
-					{
-						list.Remove(type);
-					}
-				}
-			}
+		SyncList<WorldNodeData> worldNodeDatas = NetworkedManagerBase<ZoneManager>.instance.nodes;
+		for (int i = 0; i < worldNodeDatas.Count; i++)
+		{
+			NetworkedManagerBase<ZoneManager>.instance.RemoveModifier<RoomMod_FragmentOfRadiance_StartProp>(i);
+		}
 ```
 
 ### 【BOSS】层主 1·癫狂掉率
@@ -1078,8 +1066,6 @@ using System.Globalization;
 using System.Text;
 ```
 
-备注:这段代码被编译后再被反编译的结果是错误的，会产生编译错误，所以和其他东西一起修改时，应当最后插入。
-
 ```C#
 //原代码
 base.OnCreate();
@@ -1090,42 +1076,53 @@ if (!base.isServer)
 
 //在后面添加以下代码
 
-
-DewGameResult tracked = (DewGameResult) typeof(GameResultManager).GetField("_tracked", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(NetworkedManagerBase<GameResultManager>.instance);
+DewGameResult tracked = (DewGameResult)typeof(GameResultManager)
+    .GetField("_tracked", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+    .GetValue(NetworkedManagerBase<GameResultManager>.instance);
 
 if (tracked != null)
 {
-    List<(string name, float totalDmg, float maxDmg)> dmgList = new List<(string, float, float)>();
+    List<ValueTuple<string, float, float>> dmgList = new List<ValueTuple<string, float, float>>();
 
-    foreach (DewGameResult.PlayerData playerData in tracked.players)
+    // 使用 for 循环遍历玩家数据
+    for (int i = 0; i < tracked.players.Count; i++)
     {
-       string playerProfileName = playerData.playerProfileName;
-       float totalDmg = playerData.dealtDamageToEnemies;
-       float maxDmg = playerData.maxDealtSingleDamageToEnemy;
-       dmgList.Add((playerProfileName, totalDmg, maxDmg));
+        DewGameResult.PlayerData playerData = tracked.players[i];
+        string playerProfileName = playerData.playerProfileName;
+        float totalDmg = playerData.dealtDamageToEnemies;
+        float maxDmg = playerData.maxDealtSingleDamageToEnemy;
+        dmgList.Add(ValueTuple.Create(playerProfileName, totalDmg, maxDmg));
     }
 
-    // 按总伤害降序排序
-    dmgList.Sort((a, b) => b.totalDmg.CompareTo(a.totalDmg));
+    // 按总伤害降序排序（显式委托）
+    dmgList.Sort(delegate (ValueTuple<string, float, float> a, ValueTuple<string, float, float> b)
+    {
+        return b.Item2.CompareTo(a.Item2); // 降序比较
+    });
+
     StringBuilder sb = new StringBuilder();
     sb.AppendLine("伤害排行");
-    foreach (ValueTuple<string, float, float> valueTuple in dmgList)
+
+    // 使用 for 循环遍历伤害列表
+    for (int j = 0; j < dmgList.Count; j++)
     {
-       string playerProfileName2 = valueTuple.Item1;
-       float totalDmg2 = valueTuple.Item2;
-       float maxDmg2 = valueTuple.Item3;
-       string totalDmgFormatted = totalDmg2.ToString("#,0", CultureInfo.InvariantCulture);
-       string maxDmgFormatted = maxDmg2.ToString("#,0", CultureInfo.InvariantCulture);
-       sb.AppendLine(string.Concat(new string[] { playerProfileName2, ": 总伤害 ", totalDmgFormatted, " | 最强一击 ", maxDmgFormatted }));
+        ValueTuple<string, float, float> valueTuple = dmgList[j];
+        string playerProfileName2 = valueTuple.Item1;
+        float totalDmg2 = valueTuple.Item2;
+        float maxDmg2 = valueTuple.Item3;
+        string totalDmgFormatted = totalDmg2.ToString("#,0", CultureInfo.InvariantCulture);
+        string maxDmgFormatted = maxDmg2.ToString("#,0", CultureInfo.InvariantCulture);
+        sb.AppendLine(playerProfileName2 + ": 总伤害 " + totalDmgFormatted + " | 最强一击 " + maxDmgFormatted);
     }
-    Dew.CallDelayed(delegate
+
+    // 延迟发送消息（使用显式委托）
+    Dew.CallDelayed(new Action(delegate
     {
-       NetworkedManagerBase<ChatManager>.instance.BroadcastChatMessage(new ChatManager.Message
-       {
-          type = ChatManager.MessageType.Raw,
-          content = sb.ToString()
-       });
-    }, 200);
+        ChatManager.Message message = new ChatManager.Message();
+        message.type = ChatManager.MessageType.Raw;
+        message.content = sb.ToString();
+        NetworkedManagerBase<ChatManager>.instance.BroadcastChatMessage(message);
+    }), 200);
 }
 ```
 
