@@ -2,4 +2,4 @@
 
 参数文档在此项目`attribute_list/attribute_list.md`内
 
- 如有创意想法,可提交[Issues](issues)
+ 如有创意想法,可提交[Issues](../../issues)
