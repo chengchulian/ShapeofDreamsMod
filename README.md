@@ -2,4 +2,6 @@
 
 参数文档在此项目 [`attribute_list/attribute_list.md`](attribute_list/attribute_list.md) 内
 
+已打包好的项目在[`mod`](mod)文件夹下,查看对应版本下载使用(推荐)
+
  如有创意想法,可提交[Issues](../../issues)
